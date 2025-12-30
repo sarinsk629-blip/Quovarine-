@@ -1,5 +1,412 @@
-# Quovarine
+# 🚀 Quovarine
 
-Initializing Genesis Shell...
-Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-12-30 08:41:13
-Current User's Login: sarinsk629-blip
+[![Deploy to Vercel](https://github.com/sarinsk629-blip/Quovarine-/actions/workflows/deploy.yml/badge.svg)](https://github.com/sarinsk629-blip/Quovarine-/actions/workflows/deploy.yml)
+[![Self-Healing Monitor](https://github.com/sarinsk629-blip/Quovarine-/actions/workflows/self-heal.yml/badge.svg)](https://github.com/sarinsk629-blip/Quovarine-/actions/workflows/self-heal.yml)
+
+> **An autonomous system designed to automate and streamline administrative workflows**
+
+Quovarine combines intelligent automation with self-healing capabilities to eliminate manual overhead and ensure continuous operation of critical business processes. Built on Next.js 14 with automated CI/CD and error recovery systems.
+
+---
+
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Deployment](#-deployment)
+- [Self-Healing System](#-self-healing-system)
+- [Health Monitoring](#-health-monitoring)
+- [Environment Variables](#-environment-variables)
+- [Development](#-development)
+- [Contributing](#-contributing)
+
+---
+
+## ✨ Features
+
+- **🤖 Autonomous Workflow Automation** - Intelligent task automation for administrative processes
+- **⚡ Zero-Downtime Deployments** - Automated CI/CD pipeline with Vercel integration
+- **🔄 Self-Healing Architecture** - Automatic error detection and recovery with rollback capabilities
+- **📊 Real-time Health Monitoring** - Continuous system health checks and performance monitoring
+- **🎨 Modern UI** - Dark, futuristic theme built with Next.js 14 and Tailwind CSS
+- **🔐 Production-Ready** - Comprehensive error handling and security best practices
+
+---
+
+## 🏗️ Architecture
+
+Quovarine implements a three-tier self-monitoring and recovery system:
+
+### 1. **Application Layer**
+   - Next.js 14 with React Server Components
+   - TypeScript for type safety
+   - Tailwind CSS for styling
+   - Built-in API health endpoint
+
+### 2. **Deployment & CI/CD Layer**
+   - GitHub Actions for automated deployment
+   - Vercel for hosting and edge functions
+   - Automated health checks post-deployment
+   - Build verification and testing
+
+### 3. **Self-Healing Layer**
+   - Monitors deployment workflows
+   - Automatic rollback on failure
+   - Recovery notifications via GitHub Actions summary
+   - Python-based external health monitoring
+
+```
+┌─────────────────────────────────────────────────┐
+│          Application (Next.js 14)               │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
+│  │   Pages  │  │   APIs   │  │  Health  │     │
+│  └──────────┘  └──────────┘  └──────────┘     │
+└─────────────────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────┐
+│       CI/CD Pipeline (GitHub Actions)           │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
+│  │  Build   │→ │  Deploy  │→ │  Verify  │     │
+│  └──────────┘  └──────────┘  └──────────┘     │
+└─────────────────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────┐
+│      Self-Healing System (Auto-Recovery)        │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
+│  │  Monitor │→ │ Rollback │→ │  Notify  │     │
+│  └──────────┘  └──────────┘  └──────────┘     │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Python 3.8+ (for health monitoring)
+- Git
+- A Vercel account (for deployment)
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/sarinsk629-blip/Quovarine-.git
+   cd Quovarine-
+   ```
+
+2. **Install Node.js dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual values
+   ```
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Python Health Monitor Setup
+
+1. **Install Python dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Run health monitor**
+   ```bash
+   python scripts/health_monitor.py
+   ```
+
+---
+
+## 📁 Project Structure
+
+```
+Quovarine-/
+├── .github/
+│   └── workflows/
+│       ├── deploy.yml          # Main CI/CD pipeline
+│       └── self-heal.yml       # Self-healing workflow
+├── app/
+│   ├── api/
+│   │   └── health/
+│   │       └── route.ts        # Health check endpoint
+│   ├── globals.css             # Global styles
+│   ├── layout.tsx              # Root layout
+│   └── page.tsx                # Homepage
+├── scripts/
+│   └── health_monitor.py       # Python health monitor
+├── .env.example                # Environment template
+├── .gitignore                  # Git ignore rules
+├── next.config.js              # Next.js configuration
+├── package.json                # Node dependencies
+├── postcss.config.js           # PostCSS config
+├── requirements.txt            # Python dependencies
+├── tailwind.config.js          # Tailwind CSS config
+├── tsconfig.json               # TypeScript config
+└── README.md                   # This file
+```
+
+---
+
+## 🚢 Deployment
+
+### Setting Up Vercel Deployment
+
+1. **Create a Vercel project**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Import your GitHub repository
+   - Note your Project ID and Org ID from project settings
+
+2. **Generate Vercel Token**
+   - Go to [Vercel Account Tokens](https://vercel.com/account/tokens)
+   - Create a new token with appropriate permissions
+   - Save the token securely
+
+3. **Configure GitHub Secrets**
+   Go to your repository **Settings → Secrets and variables → Actions** and add:
+   
+   - `VERCEL_TOKEN` - Your Vercel authentication token
+   - `VERCEL_ORG_ID` - Your Vercel team/user ID
+   - `VERCEL_PROJECT_ID` - Your Vercel project ID
+
+4. **Deploy**
+   - Push to the `main` branch
+   - GitHub Actions will automatically build and deploy
+   - Check the Actions tab for deployment status
+
+### Manual Deployment
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy to production
+vercel --prod
+```
+
+---
+
+## 🔄 Self-Healing System
+
+Quovarine implements an intelligent self-healing system that:
+
+### How It Works
+
+1. **Monitoring**: The `self-heal.yml` workflow monitors all deployments
+2. **Detection**: Automatically detects failed deployments
+3. **Recovery**: Attempts to rollback to the last successful deployment
+4. **Verification**: Validates the rollback with health checks
+5. **Notification**: Reports recovery actions via GitHub Actions summary
+
+### Workflow Triggers
+
+- Activates when the main deployment workflow fails
+- Uses workflow_run trigger for seamless monitoring
+- No manual intervention required
+
+### Recovery Process
+
+```
+Failed Deployment Detected
+         ↓
+Fetch Last Successful Deployment
+         ↓
+Promote Previous Version
+         ↓
+Verify Health Status
+         ↓
+Notify Team of Actions Taken
+```
+
+### Viewing Recovery Reports
+
+Check the **Actions** tab in GitHub to see:
+- Self-healing activation logs
+- Rollback details
+- Post-recovery health status
+- Recommended next steps
+
+---
+
+## 🏥 Health Monitoring
+
+### Built-in Health Endpoint
+
+The application includes a health check API at `/api/health` that returns:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-12-30T08:44:00.000Z",
+  "service": "quovarine",
+  "version": "0.1.0",
+  "uptime": 123.45,
+  "environment": "production"
+}
+```
+
+### Python Health Monitor
+
+The `scripts/health_monitor.py` script provides:
+
+- **Automated Health Checks**: Validates deployment status
+- **Retry Logic**: Exponential backoff for transient failures
+- **Detailed Logging**: Timestamped logs with error details
+- **Standalone Operation**: Can run independently of CI/CD
+
+**Usage:**
+```bash
+# Set DEPLOYMENT_URL in .env
+export DEPLOYMENT_URL=https://your-deployment.vercel.app
+
+# Run monitor
+python scripts/health_monitor.py
+```
+
+**Features:**
+- Configurable retry attempts (default: 5)
+- Exponential backoff (2s → 4s → 8s → 16s → 32s)
+- Maximum backoff cap (60s)
+- JSON-formatted logs
+
+---
+
+## 🔐 Environment Variables
+
+### Required Variables
+
+| Variable | Description | Where to Find |
+|----------|-------------|---------------|
+| `VERCEL_TOKEN` | Authentication token | [Vercel Account Tokens](https://vercel.com/account/tokens) |
+| `VERCEL_ORG_ID` | Organization/Team ID | Vercel Dashboard → Settings → General |
+| `VERCEL_PROJECT_ID` | Project ID | Project Settings → General |
+| `DEPLOYMENT_URL` | Production URL | After first deployment |
+| `OPENAI_API_KEY` | OpenAI API key (optional) | [OpenAI API Keys](https://platform.openai.com/api-keys) |
+
+### Setting Up Environment Variables
+
+**For Local Development:**
+```bash
+cp .env.example .env
+# Edit .env with your values
+```
+
+**For GitHub Actions:**
+- Repository Settings → Secrets and variables → Actions
+- Add each secret individually
+
+**For Vercel:**
+- Project Settings → Environment Variables
+- Add variables for Production, Preview, and Development
+
+---
+
+## 💻 Development
+
+### Available Scripts
+
+```bash
+npm run dev        # Start development server
+npm run build      # Build for production
+npm start          # Start production server
+npm run lint       # Run ESLint
+```
+
+### Code Style
+
+- TypeScript for type safety
+- ESLint for code quality
+- Tailwind CSS for styling
+- React Server Components where possible
+
+### Adding New Features
+
+1. Create feature branch
+2. Implement changes
+3. Test locally with `npm run dev`
+4. Build to verify: `npm run build`
+5. Create pull request
+6. Automated CI/CD will deploy on merge to main
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Standards
+
+- Write clear commit messages
+- Include tests for new features
+- Follow existing code style
+- Update documentation as needed
+
+---
+
+## 📄 License
+
+This project is part of the Quovarine autonomous workflow automation system.
+
+---
+
+## 🆘 Troubleshooting
+
+### Deployment Fails
+
+1. Check GitHub Actions logs
+2. Verify all secrets are set correctly
+3. Ensure Vercel project is properly configured
+4. Check self-healing workflow for automatic recovery
+
+### Health Check Fails
+
+1. Verify `DEPLOYMENT_URL` is correct
+2. Check if deployment is complete
+3. Review application logs in Vercel
+4. Run health monitor script for detailed diagnostics
+
+### Build Errors
+
+1. Clear cache: `rm -rf .next node_modules`
+2. Reinstall: `npm install`
+3. Check Node.js version (18+)
+4. Verify all dependencies are installed
+
+---
+
+## 📞 Support
+
+For issues and questions:
+- Open an issue on GitHub
+- Check existing issues for solutions
+- Review GitHub Actions logs for deployment issues
+
+---
+
+<div align="center">
+
+**Built with ❤️ by the Quovarine Team**
+
+*Automating the future, one workflow at a time*
+
+</div>

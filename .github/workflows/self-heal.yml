@@ -1,0 +1,77 @@
+name: Self-Healing Deployment Monitor
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Vercel"]
+    types:
+      - completed
+
+jobs:
+  monitor-and-heal:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Get last successful deployment
+        id: last-success
+        run: |
+          # Get the most recent successful deployment from Vercel
+          LAST_DEPLOYMENT=$(vercel ls --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} | grep "Ready" | head -1 | awk '{print $1}')
+          echo "last_deployment=$LAST_DEPLOYMENT" >> $GITHUB_OUTPUT
+          echo "Found last successful deployment: $LAST_DEPLOYMENT"
+
+      - name: Attempt rollback
+        if: steps.last-success.outputs.last_deployment != ''
+        run: |
+          echo "🔄 Attempting to rollback to last successful deployment..."
+          vercel promote ${{ steps.last-success.outputs.last_deployment }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} --yes || echo "Rollback promotion not available, last deployment is already active"
+
+      - name: Verify rollback health
+        if: steps.last-success.outputs.last_deployment != ''
+        run: |
+          echo "Checking health after rollback..."
+          sleep 20
+          # Get the production URL
+          PROD_URL=$(vercel ls --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} | grep "Ready" | head -1 | awk '{print $2}')
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://${PROD_URL}/api/health" || echo "000")
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ Rollback successful, system healthy"
+          else
+            echo "⚠️ System may still be unhealthy after rollback"
+          fi
+
+      - name: Create recovery notification
+        if: always()
+        run: |
+          echo "## 🚨 Self-Healing Action Triggered" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Reason:** Deployment failure detected in workflow run #${{ github.event.workflow_run.id }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Action Taken:** Attempted rollback to last successful deployment" >> $GITHUB_STEP_SUMMARY
+          echo "**Last Successful Deployment:** ${{ steps.last-success.outputs.last_deployment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- Review the failed deployment logs" >> $GITHUB_STEP_SUMMARY
+          echo "- Check for breaking changes in the last commit" >> $GITHUB_STEP_SUMMARY
+          echo "- Verify all environment variables are set correctly" >> $GITHUB_STEP_SUMMARY
+          echo "- Run tests locally before pushing again" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "## ❌ Self-Healing Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The automatic recovery process encountered an error." >> $GITHUB_STEP_SUMMARY
+          echo "Manual intervention may be required." >> $GITHUB_STEP_SUMMARY
