@@ -113,11 +113,11 @@ export class SelfHealer {
     try {
       const healthMap = await this.cloudOrchestrator.checkAllProviders();
       
-      for (const [provider, health] of healthMap) {
+      for (const [providerType, health] of healthMap) {
         if (!health.healthy) {
-          await this.handleCloudFailure(provider, health);
+          await this.handleCloudFailure(providerType, health);
         } else {
-          this.consecutiveFailures.set(`cloud-${provider}`, 0);
+          this.consecutiveFailures.set(`cloud-${providerType}`, 0);
         }
       }
     } catch (error) {
@@ -294,8 +294,8 @@ export class SelfHealer {
 
     return {
       ai: aiHealth,
-      cloud: Array.from(cloudHealth.entries()).map(([provider, health]) => ({
-        provider,
+      cloud: Array.from(cloudHealth.entries()).map(([providerType, health]) => ({
+        providerType,
         ...health
       })),
       isMonitoring: this.isMonitoring,

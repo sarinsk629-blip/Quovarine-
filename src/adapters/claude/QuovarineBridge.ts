@@ -66,8 +66,10 @@ export class QuovarineBridge {
       };
 
       // Add Extended Thinking if requested
+      // Note: Extended Thinking is a feature that may require specific API access
       if (request.thinking) {
-        claudeRequest.thinking = {
+        // Cast to any to add experimental thinking parameter
+        (claudeRequest as any).thinking = {
           type: 'enabled',
           budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
         };
@@ -102,8 +104,10 @@ export class QuovarineBridge {
       };
 
       // Add Extended Thinking if requested
+      // Note: Extended Thinking is a feature that may require specific API access
       if (request.thinking) {
-        claudeRequest.thinking = {
+        // Cast to any to add experimental thinking parameter
+        (claudeRequest as any).thinking = {
           type: 'enabled',
           budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
         };
@@ -159,8 +163,11 @@ export class QuovarineBridge {
     for (const block of response.content) {
       if (block.type === 'text') {
         textContent += block.text;
-      } else if (block.type === 'thinking') {
-        thinkingContent += (block as any).thinking || '';
+      }
+      // Note: Thinking content extraction may require specific API features
+      // Check for thinking property on the block if available
+      if ((block as any).thinking) {
+        thinkingContent += (block as any).thinking;
       }
     }
 
