@@ -1,0 +1,40 @@
+{
+  "name": "quovarine",
+  "version": "1.0.0",
+  "description": "Claude 4.5 Opus Integration Layer with Extended Thinking and Hexagonal Architecture",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "init": "bash scripts/quovarine_init.sh"
+  },
+  "keywords": [
+    "claude",
+    "opus",
+    "ai",
+    "hexagonal-architecture",
+    "self-healing"
+  ],
+  "author": "sarinsk629-blip",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.1",
+    "@aws-sdk/client-lambda": "^3.699.0",
+    "@azure/functions": "^4.5.1",
+    "next": "^14.2.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.21",
+    "typescript": "^5.7.2"
+  }
+}
