@@ -68,11 +68,16 @@ export class QuovarineBridge {
       // Add Extended Thinking if requested
       // Note: Extended Thinking is a feature that may require specific API access
       if (request.thinking) {
-        // Cast to any to add experimental thinking parameter
-        (claudeRequest as any).thinking = {
-          type: 'enabled',
-          budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
-        };
+        try {
+          // Cast to any to add experimental thinking parameter
+          (claudeRequest as any).thinking = {
+            type: 'enabled',
+            budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
+          };
+        } catch (error) {
+          console.warn('Extended Thinking feature may not be available:', error);
+          // Continue without thinking - non-critical feature
+        }
       }
 
       const response = await this.client.messages.create(claudeRequest);
@@ -106,11 +111,16 @@ export class QuovarineBridge {
       // Add Extended Thinking if requested
       // Note: Extended Thinking is a feature that may require specific API access
       if (request.thinking) {
-        // Cast to any to add experimental thinking parameter
-        (claudeRequest as any).thinking = {
-          type: 'enabled',
-          budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
-        };
+        try {
+          // Cast to any to add experimental thinking parameter
+          (claudeRequest as any).thinking = {
+            type: 'enabled',
+            budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
+          };
+        } catch (error) {
+          console.warn('Extended Thinking feature may not be available:', error);
+          // Continue without thinking - non-critical feature
+        }
       }
 
       const stream = await this.client.messages.create(claudeRequest);

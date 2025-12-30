@@ -38,6 +38,22 @@ function checkRateLimit(identifier: string, maxRequests = 50): boolean {
 }
 
 /**
+ * Constant-time string comparison to prevent timing attacks
+ */
+function secureCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  
+  return result === 0;
+}
+
+/**
  * Authentication middleware
  */
 function authenticate(request: NextRequest): boolean {
@@ -53,7 +69,7 @@ function authenticate(request: NextRequest): boolean {
   }
 
   const token = authHeader.replace('Bearer ', '');
-  return token === apiKey;
+  return secureCompare(token, apiKey);
 }
 
 /**

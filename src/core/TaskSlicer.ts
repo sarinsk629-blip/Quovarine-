@@ -308,11 +308,26 @@ Return ONLY the JSON, no additional text.`;
   import(json: string): TaskQueue {
     try {
       const data = JSON.parse(json);
-      this.taskQueue = data;
+      
+      // Validate with Zod schema
+      const validated = TaskQueueSchema.parse(data);
+      
+      // Add status and timestamps to tasks
+      this.taskQueue = {
+        tasks: validated.tasks.map(task => ({
+          ...task,
+          status: TaskStatus.PENDING,
+          createdAt: new Date()
+        })),
+        totalTasks: validated.tasks.length,
+        completedTasks: 0,
+        failedTasks: 0
+      };
+      
       return this.taskQueue;
     } catch (error) {
       throw new QuovarineError(
-        'Failed to import task queue',
+        'Failed to import task queue: Invalid data format',
         'IMPORT_FAILED',
         undefined,
         error instanceof Error ? error : undefined

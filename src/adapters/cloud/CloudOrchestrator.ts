@@ -246,11 +246,13 @@ class VercelProvider implements CloudProvider {
 
   async deploy(config: DeploymentConfig): Promise<DeploymentResult> {
     // Vercel deployment logic would go here
-    // This is a placeholder implementation
+    // This is a placeholder that indicates the deployment is not yet implemented
+    console.warn('Vercel deployment not yet implemented - returning mock success');
+    
     return {
       success: true,
       url: 'https://quovarine.vercel.app',
-      deploymentId: `vercel-${Date.now()}`,
+      deploymentId: `vercel-mock-${Date.now()}`,
       timestamp: new Date()
     };
   }
@@ -305,10 +307,12 @@ class AWSProvider implements CloudProvider {
 
   async deploy(config: DeploymentConfig): Promise<DeploymentResult> {
     // AWS Lambda deployment logic would go here
+    console.warn('AWS deployment not yet implemented - returning mock success');
+    
     return {
       success: true,
       url: 'https://quovarine.aws.com',
-      deploymentId: `aws-${Date.now()}`,
+      deploymentId: `aws-mock-${Date.now()}`,
       timestamp: new Date()
     };
   }
@@ -359,10 +363,12 @@ class AzureProvider implements CloudProvider {
 
   async deploy(config: DeploymentConfig): Promise<DeploymentResult> {
     // Azure Functions deployment logic would go here
+    console.warn('Azure deployment not yet implemented - returning mock success');
+    
     return {
       success: true,
       url: 'https://quovarine.azure.com',
-      deploymentId: `azure-${Date.now()}`,
+      deploymentId: `azure-mock-${Date.now()}`,
       timestamp: new Date()
     };
   }
