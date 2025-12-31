@@ -1,0 +1,103 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ VERCEL_TOKEN is not set"
+            exit 1
+          fi
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        continue-on-error: false
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        continue-on-error: false
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          echo "Deploying to Vercel..."
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            echo "❌ Deployment failed - no URL returned"
+            exit 1
+          fi
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "✅ Deployed to: $DEPLOYMENT_URL"
+
+      - name: Check deployment health
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
+          
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy.outputs.deployment_url }}/api/health || echo "000")
+            
+            if [ "$RESPONSE" = "200" ]; then
+              echo "✅ Deployment health check passed"
+              exit 0
+            else
+              echo "⚠️ Health check attempt $((RETRY_COUNT + 1))/$MAX_RETRIES failed with status: $RESPONSE"
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "Waiting 10 seconds before retry..."
+                sleep 10
+              fi
+            fi
+          done
+          
+          echo "❌ Deployment health check failed after $MAX_RETRIES attempts"
+          exit 1
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** ${{ steps.deploy.outputs.deployment_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Available Endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "- Homepage: ${{ steps.deploy.outputs.deployment_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Health: ${{ steps.deploy.outputs.deployment_url }}/api/health" >> $GITHUB_STEP_SUMMARY
+          echo "- Opus API: ${{ steps.deploy.outputs.deployment_url }}/api/opus" >> $GITHUB_STEP_SUMMARY
+
