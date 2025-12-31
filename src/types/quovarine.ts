@@ -101,7 +101,7 @@ export interface AdapterRequest {
   temperature?: number;
   thinking?: boolean;
   stream?: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AdapterResponse {
@@ -113,7 +113,7 @@ export interface AdapterResponse {
   };
   provider: AIProvider;
   model: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Cloud Provider Types
@@ -238,7 +238,8 @@ export class ProviderUnavailableError extends QuovarineError {
 }
 
 export class RateLimitError extends QuovarineError {
-  constructor(provider: string, retryAfter?: number) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(provider: string, _retryAfter?: number) {
     super(
       `Rate limit exceeded for provider ${provider}`,
       'RATE_LIMIT_EXCEEDED',

@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  poweredByHeader: false,
+  compress: true,
+  output: 'standalone',
   experimental: {
     serverComponentsExternalPackages: ['@anthropic-ai/sdk']
   },
@@ -13,6 +16,14 @@ const nextConfig = {
       tls: false,
     };
     return config;
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
 };
 
