@@ -42,21 +42,27 @@ export async function POST(request: NextRequest) {
     
     // Send prompt to Claude
     let responseText: string;
+    let usage = { input_tokens: 0, output_tokens: 0 };
+    
     if (context) {
       responseText = await bridge.analyzeTask(prompt, context);
     } else {
       responseText = await bridge.sendPrompt(prompt);
     }
     
-    // Get usage information (simplified for now)
+    // Get actual usage from the bridge if available
+    // For now, we use estimates since the bridge doesn't return usage directly
+    // TODO: Update bridge methods to return full response with usage data
+    usage = {
+      input_tokens: Math.ceil(prompt.length / 4),
+      output_tokens: Math.ceil(responseText.length / 4),
+    };
+    
     const response: OpusResponse = {
       success: true,
       data: {
         text: responseText,
-        usage: {
-          input_tokens: prompt.length / 4, // Rough estimate
-          output_tokens: responseText.length / 4, // Rough estimate
-        },
+        usage,
       },
     };
     

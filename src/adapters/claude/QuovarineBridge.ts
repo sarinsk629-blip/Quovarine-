@@ -48,7 +48,16 @@ export class QuovarineBridge {
         })),
       });
       
-      return response as unknown as ClaudeResponse;
+      // Safely map the Anthropic SDK response to our ClaudeResponse type
+      return {
+        id: response.id,
+        type: response.type,
+        role: response.role,
+        content: response.content,
+        model: response.model,
+        stop_reason: response.stop_reason,
+        usage: response.usage,
+      } as ClaudeResponse;
     } catch (error) {
       console.error('[QuovarineBridge] Error sending message:', error);
       throw error;

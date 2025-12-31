@@ -121,10 +121,16 @@ export class TaskSlicer {
   }
 }
 
-// For simple UUID generation without external dependency
-// Using timestamp + random for uniqueness
+// For UUID generation using Node.js crypto (better than timestamp + random)
 function uuidv4(): string {
+  // Use crypto.randomUUID() if available (Node 16+), otherwise fallback
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  
+  // Fallback for environments without crypto.randomUUID()
   const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 15);
-  return `${timestamp}-${random}`;
+  const random1 = Math.random().toString(36).substring(2, 15);
+  const random2 = Math.random().toString(36).substring(2, 15);
+  return `${timestamp}-${random1}-${random2}`;
 }
