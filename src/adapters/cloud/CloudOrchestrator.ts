@@ -244,7 +244,8 @@ class VercelProvider implements CloudProvider {
     return !!PROVIDERS_CONFIG.cloud[CloudType.VERCEL]?.apiKey;
   }
 
-  async deploy(config: DeploymentConfig): Promise<DeploymentResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async deploy(_config: DeploymentConfig): Promise<DeploymentResult> {
     // Vercel deployment logic would go here
     // This is a placeholder that indicates the deployment is not yet implemented
     console.warn('Vercel deployment not yet implemented - returning mock success');
@@ -305,7 +306,8 @@ class AWSProvider implements CloudProvider {
     );
   }
 
-  async deploy(config: DeploymentConfig): Promise<DeploymentResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async deploy(_config: DeploymentConfig): Promise<DeploymentResult> {
     // AWS Lambda deployment logic would go here
     console.warn('AWS deployment not yet implemented - returning mock success');
     
@@ -361,7 +363,8 @@ class AzureProvider implements CloudProvider {
     return !!PROVIDERS_CONFIG.cloud[CloudType.AZURE]?.apiKey;
   }
 
-  async deploy(config: DeploymentConfig): Promise<DeploymentResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async deploy(_config: DeploymentConfig): Promise<DeploymentResult> {
     // Azure Functions deployment logic would go here
     console.warn('Azure deployment not yet implemented - returning mock success');
     

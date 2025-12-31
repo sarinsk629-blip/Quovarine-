@@ -20,7 +20,7 @@ export class OmniAdapter implements AIAdapter {
   name: string;
   provider: AIProvider;
   private primaryAdapter: QuovarineBridge | null = null;
-  private fallbackAdapters: Map<AIProvider, any> = new Map();
+  private fallbackAdapters: Map<AIProvider, QuovarineBridge> = new Map();
   private currentProvider: AIProvider;
 
   constructor(primaryProvider: AIProvider = AIProvider.ANTHROPIC) {
@@ -206,7 +206,7 @@ export class OmniAdapter implements AIAdapter {
   /**
    * Get the adapter for a specific provider
    */
-  private getAdapter(provider: AIProvider): QuovarineBridge | any | null {
+  private getAdapter(provider: AIProvider): QuovarineBridge | null {
     if (provider === AIProvider.ANTHROPIC) {
       return this.primaryAdapter;
     }

@@ -216,7 +216,7 @@ async function handleStreamingResponse(
 /**
  * GET handler for health check
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const adapter = new OmniAdapter();
     const health = await adapter.healthCheck();
@@ -242,7 +242,7 @@ export async function GET(request: NextRequest) {
 /**
  * OPTIONS handler for CORS
  */
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {

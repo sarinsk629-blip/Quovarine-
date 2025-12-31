@@ -5,8 +5,6 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import {
-  ClaudeRequest,
-  ClaudeResponse,
   StreamChunk,
   AdapterRequest,
   AdapterResponse,
@@ -69,8 +67,8 @@ export class QuovarineBridge {
       // Note: Extended Thinking is a feature that may require specific API access
       if (request.thinking) {
         try {
-          // Cast to any to add experimental thinking parameter
-          (claudeRequest as any).thinking = {
+          // Cast to Record to add experimental thinking parameter
+          (claudeRequest as unknown as Record<string, unknown>).thinking = {
             type: 'enabled',
             budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
           };
@@ -112,8 +110,8 @@ export class QuovarineBridge {
       // Note: Extended Thinking is a feature that may require specific API access
       if (request.thinking) {
         try {
-          // Cast to any to add experimental thinking parameter
-          (claudeRequest as any).thinking = {
+          // Cast to Record to add experimental thinking parameter
+          (claudeRequest as unknown as Record<string, unknown>).thinking = {
             type: 'enabled',
             budget_tokens: CLAUDE_CONFIG.thinkingEffort[this.thinkingEffort]
           };
@@ -140,7 +138,7 @@ export class QuovarineBridge {
     const startTime = Date.now();
     
     try {
-      const response = await Promise.race([
+      await Promise.race([
         this.client.messages.create({
           model: this.model,
           max_tokens: 10,
@@ -176,8 +174,9 @@ export class QuovarineBridge {
       }
       // Note: Thinking content extraction may require specific API features
       // Check for thinking property on the block if available
-      if ((block as any).thinking) {
-        thinkingContent += (block as any).thinking;
+      const blockWithThinking = block as unknown as Record<string, unknown>;
+      if (blockWithThinking.thinking) {
+        thinkingContent += String(blockWithThinking.thinking);
       }
     }
 
@@ -200,20 +199,21 @@ export class QuovarineBridge {
   /**
    * Parse streaming chunk
    */
-  private parseStreamChunk(chunk: any): StreamChunk {
+  private parseStreamChunk(chunk: unknown): StreamChunk {
+    const c = chunk as Record<string, unknown>;
     return {
-      type: chunk.type,
-      index: chunk.index,
-      delta: chunk.delta,
-      content_block: chunk.content_block
-    };
+      type: c.type,
+      index: c.index,
+      delta: c.delta,
+      content_block: c.content_block
+    } as StreamChunk;
   }
 
   /**
    * Handle errors with retry logic
    */
   private async handleError(
-    error: any,
+    error: unknown,
     request: AdapterRequest,
     retryCount: number
   ): Promise<AdapterResponse> {
@@ -236,7 +236,7 @@ export class QuovarineBridge {
   /**
    * Create appropriate QuovarineError from raw error
    */
-  private createError(error: any): QuovarineError {
+  private createError(error: unknown): QuovarineError {
     if (error instanceof Anthropic.APIError) {
       if (error.status === 429) {
         return new RateLimitError(AIProvider.ANTHROPIC);
@@ -250,28 +250,30 @@ export class QuovarineBridge {
       );
     }
 
-    if (error.code && RETRY_CONFIG.retryableErrors.includes(error.code)) {
-      return new ProviderUnavailableError(AIProvider.ANTHROPIC, error);
+    const err = error as { code?: string; message?: string };
+    if (err.code && RETRY_CONFIG.retryableErrors.includes(err.code)) {
+      return new ProviderUnavailableError(AIProvider.ANTHROPIC, error as Error);
     }
 
     return new QuovarineError(
-      error.message || 'Unknown error',
+      err.message || 'Unknown error',
       'UNKNOWN_ERROR',
       AIProvider.ANTHROPIC,
-      error
+      error as Error
     );
   }
 
   /**
    * Check if error is retryable
    */
-  private isRetryable(error: any): boolean {
+  private isRetryable(error: unknown): boolean {
     if (error instanceof Anthropic.APIError) {
       return RETRY_CONFIG.retryableStatusCodes.includes(error.status || 0);
     }
 
-    if (error.code) {
-      return RETRY_CONFIG.retryableErrors.includes(error.code);
+    const err = error as { code?: string };
+    if (err.code) {
+      return RETRY_CONFIG.retryableErrors.includes(err.code);
     }
 
     return false;
